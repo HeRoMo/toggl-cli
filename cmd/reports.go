@@ -2,6 +2,7 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"os"
@@ -26,11 +27,14 @@ to quickly create a Cobra application.`,
 		since, _ := cmd.Flags().GetString("since")
 		until, _ := cmd.Flags().GetString("until")
 
+		ctx, cancelFunc := context.WithCancel(context.Background())
 		togglClient := toggl.Client(togglToken)
-		report, err := togglClient.Reports(workspaceID, since, until)
+		report, err := togglClient.Reports(ctx, workspaceID, since, until)
 		if err != nil {
 			log.Fatal(err)
 		}
+
+		cancelFunc()
 
 		fmt.Printf("%+v\n", report)
 	},
